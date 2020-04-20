@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "app-template2"
+  },
+  "targets": {
+    "app-template2": {
+      "hosting": {
+        "app-template2": [
+          "app-template2"
+        ]
+      }
+    }
+  }
+}

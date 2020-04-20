@@ -1,0 +1,15 @@
+.toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-end;
+    margin: 6px -15px 6px -15px;
+    padding: 5px;
+    border-bottom: solid 1px gainsboro;
+}
+
+.toolbar-item {
+    background-color: transparent;
+    display: block;
+    height: 36px;
+}
