@@ -11,7 +11,7 @@ $background-color: rgb(30, 30, 30);
   left: 0;
   height: 100vh;
   width: $sidebar-width;
-  z-index: 999;
+  z-index: 998;
   color: $active-color;
   background-color: $background-color;
   scrollbar-color: $background-color;
@@ -72,7 +72,7 @@ $background-color: rgb(30, 30, 30);
     padding-left: 0px;
     padding-bottom: 0px;
     margin: 0px;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 
     .sidebar-list-item {
       color: $unactive-color;
@@ -131,14 +131,13 @@ $background-color: rgb(30, 30, 30);
       width: 100vw;
     }
   }
+
+  .loader {
+    left:0;
+  }
 }
 
-// Mobile view
-@media (max-width: 768px) {
-  #wrapper.sidebar-hidden #sidebar{
-    left: - $sidebar-width;
-  }
-
+#wrapper.mobile-view {
   #tabs {
     left: 0;
     width: 100vw;
@@ -151,5 +150,19 @@ $background-color: rgb(30, 30, 30);
       width: 100vw;
     }
   }
+
+  .loader {
+    left:0;
+  }
 }
 
+#backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  opacity: 10%;
+  background-color: $background-color;
+  z-index: 999;
+}

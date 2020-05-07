@@ -1,14 +1,14 @@
 import { BehaviorSubject } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
 import { Injectable } from '@angular/core';
-import { Page } from '../pages/page';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
-import { LayoutState, SectionState, DEFAULT_LAYOUT_STATE, SectionGroupState } from './layout-state';
+import { LayoutState, SectionState, DEFAULT_LAYOUT_STATE, SectionGroupState, Page } from './layout';
 
 @Injectable()
 export class LayoutProvider {
     private readonly LAYOUT_STATE_STORAGE_KEY = 'layout-state';
     private _layoutState: LayoutState;
+    public loaderVisibale: BehaviorSubject<boolean>;
     public layoutState: BehaviorSubject<LayoutState>;
 
     constructor(
@@ -16,14 +16,15 @@ export class LayoutProvider {
         private breakpointObserver: BreakpointObserver
     ) {
         this.load();
+        this.loaderVisibale = new BehaviorSubject(false);
         this.breakpointObserver
         .observe(['(max-width: 768px)'])
         .subscribe((state: BreakpointState) => {
             if (state.matches) {
                 this._layoutState.mobileView = true;
-                this._layoutState.sidebarHidden = true;
+                this._layoutState.showSidebar = false;
             } else {
-                this._layoutState.sidebarHidden = false;
+                this._layoutState.showSidebar = true;
                 this._layoutState.mobileView = false;
             }
             this.save();
@@ -31,84 +32,50 @@ export class LayoutProvider {
 
         this.router.events.subscribe(event => {
             if (event instanceof NavigationEnd) {
-                this.openPage(event.urlAfterRedirects);
+                this.hideLoader();
+                this.activatePath(event.urlAfterRedirects);
             }
         });
     }
 
-    public save() {
-        localStorage.setItem(this.LAYOUT_STATE_STORAGE_KEY, JSON.stringify(this._layoutState));
-        this.layoutState.next(this._layoutState);
-    }
-
-    public load() {
-        const layoutState = JSON.parse(localStorage.getItem(this.LAYOUT_STATE_STORAGE_KEY));
-        if (layoutState) {
-            this._layoutState =  layoutState;
+    public registerPage(page: Page) {
+        const section = this.getSection(page.paths[0]);
+        const p = section.pages.find(x => x.id === page.id);
+        if (p) {
+            p.name = page.name;
+            p.closeable = page.closeable;
         } else {
-            this._layoutState = DEFAULT_LAYOUT_STATE;
-        }
-
-        this.layoutState = new BehaviorSubject<LayoutState>(this._layoutState);
-    }
-
-    public openSection(section: SectionState) {
-        this._layoutState.activeSection = section;
-        this.router.navigate([section.activePath]);
-        if (this._layoutState.mobileView) {
-            this._layoutState.sidebarHidden = true;
+            section.pages.push(page);
         }
         this.save();
     }
 
-    public openPage(path: string, name: string = path, closeable: boolean = true) {
-        const section = this.getSection(path);
+    public unregisterPage(page: Page): string {
+        const section = this.getSection(page.paths[0]);
         if (!section) {
             return;
         }
-
-        this._layoutState.activeSection = section;
-        this.router.navigate([path]).then(() => {
-            let page = section.openPages.find(p => p.path === path);
-            if (!page) {
-                page = new Page({ name, path, closeable});
-                section.openPages.push(page);
-            } else {
-                if (name !== path) {
-                    page.name = name;
-                }
-                page.closeable = closeable;
-            }
-            section.activePath = page.path;
-            this.save();
-        });
-    }
-
-    public closePage(path: string) {
-        const section = this.getSection(path);
-        if (!section) {
-            return;
-        }
-        const index = section.openPages.findIndex(p => p.path === path);
+        const index = section.pages.findIndex(p => p.id === page.id);
 
         if (index > -1) {
             let navigateToIndex = index - 1;
             if (navigateToIndex < 0) {
                 navigateToIndex = 0;
             }
-            section.openPages.splice(index, 1);
+            section.pages.splice(index, 1);
 
-            if (section.activePath === path) {
-                section.activePath = section.openPages[navigateToIndex].path;
-                this.router.navigate([section.activePath]);
+            if (this.hasPath(page, section.activePath)) {
+                section.activePath = section.pages[navigateToIndex].paths[0];
             }
 
             this.save();
         }
+
+        return section.activePath;
     }
 
     public toggleSidebar() {
-        this._layoutState.sidebarHidden = !this._layoutState.sidebarHidden;
+        this._layoutState.showSidebar = !this._layoutState.showSidebar;
         this.save();
     }
 
@@ -117,12 +84,53 @@ export class LayoutProvider {
         this.save();
     }
 
+    public showLoader() {
+        this.loaderVisibale.next(true);
+    }
+
+    public hideLoader() {
+        this.loaderVisibale.next(false);
+    }
+
+    public getActiveSection(): SectionState {
+        return this.getSection(this._layoutState.activePath);
+    }
+
+    private activatePath(path: string) {
+        const section = this.getSection(path);
+        if (section) {
+            this._layoutState.activePath = path;
+            section.activePath = path;
+        }
+
+        if (this._layoutState.mobileView) {
+            this._layoutState.showSidebar = false;
+        }
+
+        this.save();
+    }
+
+    private load() {
+        const layoutState = JSON.parse(localStorage.getItem(this.LAYOUT_STATE_STORAGE_KEY));
+        if (layoutState) {
+            this._layoutState =  layoutState;
+        } else {
+            this._layoutState = DEFAULT_LAYOUT_STATE;
+        }
+        this.layoutState = new BehaviorSubject<LayoutState>(this._layoutState);
+    }
+
+    private save() {
+        localStorage.setItem(this.LAYOUT_STATE_STORAGE_KEY, JSON.stringify(this._layoutState));
+        this.layoutState.next(this._layoutState);
+    }
+
     private getSection(path: string): SectionState {
         let section = null;
         let sectionPath = null;
         const segments = path.split('/');
         if (segments.length > 1) {
-            sectionPath = segments[1];
+            sectionPath = '/' + segments[1];
         }
         if (sectionPath) {
             for (const prop in this._layoutState) {
@@ -134,5 +142,24 @@ export class LayoutProvider {
         }
         return section;
     }
-}
 
+    private getPage(section: SectionState, path: string): Page {
+        let result = null;
+        for (const page of section.pages) {
+            const p = page.paths.find(x => x === path);
+            if (p) {
+                result = page;
+                break;
+            }
+        }
+        return result;
+    }
+
+    private hasPath(page: Page, path: string): boolean {
+        const p = page.paths.find(x => x === path);
+        if (p) {
+            return true;
+        }
+        return false;
+    }
+}

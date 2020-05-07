@@ -31,6 +31,11 @@ $toggle-btn-color: rgb(136, 136, 136);
     border-bottom: solid $active-color 1px;
 }
 
+.close {
+    font-size: 16px;
+    margin-top: 2px;
+}
+
 #toggle-sidebar {
     cursor: pointer;
     display: block;

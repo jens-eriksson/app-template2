@@ -1,1 +1,25 @@
+<div class="toolbar">
+    <button class="toolbar-item" (click)="add()">
+        <span class="fas fa-plus"></span>
+        Add
+     </button>
+</div>
+<div class="row h-100">
+<div class="col-auto border-right">
+    <div class="row" *ngFor="let user of users">
+        <div class="col-auto p-2">
+            <span class="fas fa-user-circle fa-3x mt-1"></span>
+        </div>
+        <div class="col p-2">
+            <div class="text-nowrap lead">{{ user.displayName }}</div>
+            <div class="text-nowrap">{{ user.email }}</div>
+        </div>
+    </div>
+</div>
+<div class="col">
+    <div class=""> 
+        SELECTED
+    </div>
+</div>
 
+</div>

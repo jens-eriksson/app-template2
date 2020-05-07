@@ -1,7 +1,7 @@
-import { LayoutState } from './../layout-state';
+import { Router } from '@angular/router';
+import { LayoutState, Page } from './../layout';
 import { LayoutProvider } from './../layout.provider';
 import { Component, OnInit, HostListener } from '@angular/core';
-import { Page } from '../../pages/page';
 
 @Component({
   selector: 'app-tabs',
@@ -13,35 +13,39 @@ export class TabsComponent implements OnInit {
   private tabsComponent: HTMLElement;
   layoutState: LayoutState;
   activePath: string;
-  pages: Page[];
-  tabs: Page[] = [];
+  tabs: Page[];
+  visableTabs: Page[] = [];
   tabsDropdown: Page[] = [];
   showTabsDropdown = false;
 
-  constructor(private layoutProvider: LayoutProvider) {
+  constructor(
+    private layout: LayoutProvider,
+    private router: Router
+    ) {
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event) {
+  onResize() {
     this.arrangeTabs();
   }
 
   ngOnInit() {
     this.tabsComponent = document.getElementById('tabs');
-    this.layoutProvider.layoutState.subscribe(layoutState => {
+    this.layout.layoutState.subscribe(layoutState => {
       this.layoutState = layoutState;
-      this.activePath = layoutState.activeSection.activePath;
-      this.pages = layoutState.activeSection.openPages;
+      this.activePath = layoutState.activePath;
+      this.tabs = this.layout.getActiveSection().pages;
       this.arrangeTabs();
     });
   }
 
   open(page: Page) {
-    this.layoutProvider.openPage(page.path, page.name, page.closeable);
+    this.router.navigate([page.paths[0]]);
   }
 
   close(page: Page) {
-    this.layoutProvider.closePage(page.path);
+    const path = this.layout.unregisterPage(page);
+    this.router.navigate([path]);
   }
 
   togglePageMenu() {
@@ -49,24 +53,27 @@ export class TabsComponent implements OnInit {
   }
 
   toggleSidebar() {
-    this.layoutProvider.toggleSidebar();
+    this.layout.toggleSidebar();
   }
 
   arrangeTabs() {
     const width = this.tabsComponent.clientWidth;
     const visbaleCount = Math.floor(width / (this.TAB_WIDTH));
-    if (visbaleCount < this.pages.length) {
-      this.tabs = this.pages.slice(0, visbaleCount);
-      this.tabsDropdown = [];
-      for (const openTab of this.pages) {
-        if (!this.tabs.find(t => t.path === openTab.path)) {
-          this.tabsDropdown.push(openTab);
-        }
-      }
+    if (visbaleCount < this.tabs.length) {
+      this.visableTabs = this.tabs.slice(0, visbaleCount);
+      this.tabsDropdown = this.tabs.slice(visbaleCount, this.tabs.length);
     } else {
-      this.tabs = this.pages.slice(0, this.pages.length);
+      this.visableTabs = this.tabs.slice(0, this.tabs.length);
       this.tabsDropdown = [];
     }
     this.showTabsDropdown = false;
+  }
+
+  isActive(tab: Page) {
+    const path = tab.paths.find(p => p === this.activePath);
+    if (path) {
+      return true;
+    }
+    return false;
   }
 }

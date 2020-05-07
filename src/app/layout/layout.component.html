@@ -1,39 +1,48 @@
 <!-- Wrapper -->
-<div id="wrapper"  class="d-flex" [ngClass]="{'sidebar-hidden':layoutState.sidebarHidden}">
+<div id="wrapper"  class="d-flex" [ngClass]="{'sidebar-hidden':!layoutState.showSidebar, 'mobile-view':layoutState.mobileView}">
     <!-- Sidebar -->
     <div id="sidebar">
         <div id="sidebar-heading">
-            <h4 class="float-left">App Template 2</h4>
+            <h4 class="noselect">App Template 2</h4>
         </div>
         <div id="sidebar-top">
             <div class="group">
-                <div class="group-heading" (click)="toggleGroup(layoutState.groupOne)">
-                    GROUP ONE
-                    <span *ngIf="layoutState.groupOne.hidden" class="fas fa-caret-down float-right"></span>
-                    <span *ngIf="!layoutState.groupOne.hidden" class="fas fa-caret-up float-right"></span>
+                <div class="group-heading noselect" (click)="toggleSectionGroup(layoutState.groupOne)">
+                    <h5>GROUP ONE
+                        <span *ngIf="layoutState.groupOne.hidden" class="fas fa-caret-down float-right"></span>
+                        <span *ngIf="!layoutState.groupOne.hidden" class="fas fa-caret-up float-right"></span>
+                    </h5>
                 </div>
                 <ul id="group-one" class="sidebar-list" [hidden]="layoutState.groupOne.hidden">
-                    <li class="sidebar-list-item" (click)="openSection(layoutState.sectionOne)" [ngClass]="{'active':layoutState.activeSection.id === layoutState.sectionOne.id }">
+                    <li class="sidebar-list-item" (click)="activateSection(layoutState.sectionOne)" [ngClass]="{'active':activeSection.id === layoutState.sectionOne.id }">
                         <span class="icon">
                             <i class="fas fa-chart-line"></i>
                         </span>
-                        Section One
+                        <span class="noselect">
+                            Section One
+                        </span>
+                        
                     </li>
                 </ul>
             </div>
             <div class="group">
                 <ul class="sidebar-list">
-                    <li class="sidebar-list-item" (click)="openSection(layoutState.sectionTwo)" [ngClass]="{'active':layoutState.activeSection.id === layoutState.sectionTwo.id }">
+                    <li class="sidebar-list-item" (click)="activateSection(layoutState.sectionTwo)" [ngClass]="{'active':activeSection.id === layoutState.sectionTwo.id }">
                         <span class="icon">
                             <i class="far fa-building"></i>
                         </span>
-                        Section Two
+                        <span class="noselect">
+                            Section Two
+                        </span>
+                        
                     </li>
-                    <li class="sidebar-list-item" (click)="openSection(layoutState.sectionThree)" [ngClass]="{'active':layoutState.activeSection.id === layoutState.sectionThree.id}">
+                    <li class="sidebar-list-item" (click)="activateSection(layoutState.sectionThree)" [ngClass]="{'active':activeSection.id === layoutState.sectionThree.id}">
                         <span class="icon">
                             <i class="fas fa-chart-line"></i>
                         </span>
-                        Section Three
+                        <span class="noselect">
+                            Section Three
+                        </span>
                     </li>
                 </ul>
             </div>
@@ -41,17 +50,21 @@
         
         <div id="sidebar-bottom">
             <ul class="sidebar-list">
-                <li class="sidebar-list-item" (click)="openSection(layoutState.profile)" [ngClass]="{'active':layoutState.activeSection.id === layoutState.profile.id }">
+                <li class="sidebar-list-item" (click)="activateSection(layoutState.profile)" [ngClass]="{'active':activeSection.id === layoutState.profile.id }">
                     <span class="icon">
                         <i class="fas fa-user"></i>
                     </span>
-                    Profile
+                    <span class="noselect">
+                        {{ userDisplayName }}
+                    </span>
                 </li>
-                <li class="sidebar-list-item" (click)="openSection(layoutState.settings)" [ngClass]="{'active':layoutState.activeSection.id === layoutState.settings.id }">
+                <li class="sidebar-list-item" (click)="activateSection(layoutState.settings)" [ngClass]="{'active':activeSection.id === layoutState.settings.id }">
                     <span class="icon">
                         <i class="fas fa-cog"></i>
                     </span>
-                    Settings
+                    <span class="noselect">
+                        Settings
+                    </span>
                 </li>
             </ul>
         </div>
@@ -68,4 +81,7 @@
     </div>
 </div>
 
+<!-- Modals -->
+<div id="backdrop" [hidden]="!showBackdrop"></div>
+<div id="modal-placeholder" #modalPlaceholder></div>
 

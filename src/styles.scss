@@ -1,5 +1,7 @@
+@import 'loader';
+
 body {
-    font-family: 'Average Sans', sans-serif;
+    font-family: 'Roboto', 'Average Sans', sans-serif;
     overflow-x: hidden;
 }
 
@@ -11,6 +13,18 @@ h1, h2, h3, h4, h5, h6 {
 a {
     cursor: pointer;
   }
+
+table {
+  width: 100%;
+  tr {
+    border-bottom: 1px solid gainsboro;
+    td {
+      padding: 4px;
+    }
+  }
+  
+}
+
 
 /* The switch - the box around the slider */
 .switch {
@@ -83,4 +97,14 @@ input:checked + .slider:before {
 .modal-dialog {
   border-radius: 0.2rem;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
 }

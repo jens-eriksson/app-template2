@@ -1,4 +1,3 @@
-import { ProfilePageComponent } from './profile-page/profile-page.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +6,7 @@ import { PageTwoComponent } from './page-two/page-two.component';
 import { PageThreeComponent } from './page-three/page-three.component';
 import { PageFourComponent } from './page-four/page-four.component';
 import { UsersComponent } from './users/users.component';
+import { EditUserComponent } from './users/edit-user/edit-user.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +15,7 @@ import { UsersComponent } from './users/users.component';
     PageThreeComponent,
     PageFourComponent,
     UsersComponent,
-    ProfilePageComponent
+    EditUserComponent
   ],
   imports: [
     CommonModule,
@@ -26,8 +26,7 @@ import { UsersComponent } from './users/users.component';
     PageTwoComponent,
     PageThreeComponent,
     PageFourComponent,
-    UsersComponent,
-    ProfilePageComponent
+    UsersComponent
   ],
   providers: [
   ]
